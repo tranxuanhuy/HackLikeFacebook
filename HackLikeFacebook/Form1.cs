@@ -24,13 +24,13 @@ namespace HackLikeFacebook
             //!Make sure to add the path to where you extracting the chromedriver.exe:
             ChromeOptions options = new ChromeOptions();
             options.AddArgument("--disable-popup-blocking");
-            IWebDriver driver = new ChromeDriver(@"C:\Users\Administrator\Downloads\chromedriver_win32",options); //<-Add your path
+            IWebDriver driver = new ChromeDriver(@"C:\",options); //<-Add your path
           
 driver.Navigate().GoToUrl("https://www.tempmailaddress.com/");
 var email=driver.FindElement(By.Id("email")).Text;
 driver.Navigate().GoToUrl("https://www.facebook.com/");
-var lastname = "dau";
-var firstname = "nach";
+var lastname = "thu";
+var firstname = "hang";
 var password = "950460";
 driver.FindElement(By.Name("lastname")).SendKeys(lastname);
 driver.FindElement(By.Name("firstname")).SendKeys(firstname);
