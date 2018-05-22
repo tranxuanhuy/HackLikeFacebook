@@ -3,6 +3,7 @@ using OpenQA.Selenium.Chrome;
 using System;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Threading;
 
 namespace HackLikeFacebook
@@ -21,11 +22,12 @@ namespace HackLikeFacebook
 
                 try
                 {
-                    string emailCreated = CreateAccountandLike();
-
-                    if (emailCreated!=null)
+                    string emailCreated = CreateAccountandLike(proxy);
+                    
+                    if (emailCreated != null)
                     {
-                        w.WriteToFileThreadSafe(emailCreated, "adsLog1.txt"); 
+                        string country = getCountryofProxy(proxy);
+                        w.WriteToFileThreadSafe(emailCreated+"\t\t"+ country, "adsLog1.txt");
                     }
                 }
                 catch (Exception e)
@@ -38,7 +40,37 @@ namespace HackLikeFacebook
 
         }
 
-        private string CreateAccountandLike()
+        private static string getCountryofProxy(string proxy)
+        {
+            // Create a request for the URL. 
+            WebRequest request = WebRequest.Create("http://ip-score.com");
+            request.Proxy = new WebProxy(proxy.Split(':')[0], int.Parse(proxy.Split(':')[1]));
+            // If required by the server, set the credentials.
+            request.Credentials = CredentialCache.DefaultCredentials;
+            // Get the response.
+            WebResponse response = request.GetResponse();
+            // Display the status.
+            Console.WriteLine(((HttpWebResponse)response).StatusDescription);
+            // Get the stream containing content returned by the server.
+            Stream dataStream = response.GetResponseStream();
+            // Open the stream using a StreamReader for easy access.
+            StreamReader reader = new StreamReader(dataStream);
+            // Read the content.
+            string responseFromServer = reader.ReadToEnd();
+            // Display the content.
+            //Console.WriteLine(responseFromServer);
+            string filename = proxy.Replace(":", " ");
+            filename = filename + ".txt";
+            File.WriteAllText(filename, responseFromServer);
+            string info = File.ReadLines(filename).Skip(145).First() + File.ReadLines(filename).Skip(146).First() + File.ReadLines(filename).Skip(147).First();
+            info = info.Remove(0, info.IndexOf("png\">") + 6);
+            info = info.Replace("</p>							<p><em>State:</em> ", "\t");
+            info = info.Replace("</p>							<p><em>City:</em> ", "\t");
+            info = info.Replace("</p>", "");
+            return info;
+        }
+
+        private string CreateAccountandLike(string proxy)
         {
 
             {
@@ -46,28 +78,37 @@ namespace HackLikeFacebook
                 ChromeOptions options = new ChromeOptions();
                 options.AddArgument("--disable-popup-blocking");
                 options.AddArguments("--disable-notifications");
+                //options.AddArguments("--proxy-server="+proxy);
+                options.AddArguments("--proxy-server=socks5://" + proxy);
                 string proxyFromFile = ReadFileAtLine(1, "proxy.txt").Replace("\t", ":");
-                var proxy = new Proxy();
-                //Set the http proxy value, host and port.
-                proxy.HttpProxy = proxyFromFile;
-                proxy.SslProxy = proxyFromFile;
-                //Set the proxy to the Chrome options
-                //options.Proxy = proxy;
+                
                 var userAgent = ReadRandomLineOfFile("useragentswitcher.txt");
                 //options.AddArgument("--user-agent="+ userAgent);
                 IWebDriver driver = new ChromeDriver(@"C:\", options); //<-Add your path
-
                 driver.Navigate().GoToUrl("https://generator.email/inbox7/");
-                var email = driver.FindElement(By.Id("email_ch_text")).Text;
+                var email="";
+                try
+                {
+                    email = driver.FindElement(By.Id("email_ch_text")).Text;
+                }
+                catch (Exception)
+                {
+                    driver.Quit();
+                    return null;
+
+                }
                 driver.Navigate().GoToUrl("https://www.facebook.com/");
 
                 int Numrd;
                 Random rd = new Random();
                 Numrd = rd.Next(1, 3);
+                var firstname = ReadRandomLineOfFile("vnname.txt").Split(' ')[Numrd];
+                System.Threading.Thread.Sleep(1000);
+                Numrd = rd.Next(1, 3);
                 var lastname = ReadRandomLineOfFile("vnname.txt").Split(' ')[Numrd];
                 System.Threading.Thread.Sleep(1000);
                 Numrd = rd.Next(1, 3);
-                var firstname = ReadRandomLineOfFile("vnname.txt").Split(' ')[Numrd];
+                lastname += " "+ReadRandomLineOfFile("vnname.txt").Split(' ')[Numrd];
                 var password = "950460";
 
                 driver.FindElement(By.Name("lastname")).SendKeys(lastname);
@@ -82,6 +123,12 @@ namespace HackLikeFacebook
                 driver.FindElement(By.Name("sex")).Click();
                 driver.FindElement(By.Name("websubmit")).Click();
                 System.Threading.Thread.Sleep(10000);
+                body = driver.FindElement(By.TagName("body"));
+                if (body.Text.Contains("again"))
+                {
+                    driver.Quit();
+                    return null; 
+                }
                 driver.Navigate().GoToUrl("https://generator.email/inbox7/");
                 System.Threading.Thread.Sleep(5000);
                 string[] separatingChars1 = { "Subject: " };
@@ -133,7 +180,7 @@ namespace HackLikeFacebook
                     {
                         if (buttonLike.GetAttribute("aria-pressed") == "false")
                             buttonLike.Click();
-                        System.Threading.Thread.Sleep(2000);
+                        System.Threading.Thread.Sleep(200);
                     }
                     catch (Exception ex)
                     {
@@ -167,7 +214,7 @@ namespace HackLikeFacebook
                 for (int i = 0; i < 4; i++)
                 {
                     body.SendKeys(OpenQA.Selenium.Keys.End);
-                    System.Threading.Thread.Sleep(2000);
+                    System.Threading.Thread.Sleep(200);
                 }
                 buttonLikeList = driver.FindElements(By.CssSelector(".UFILikeLink._4x9-._4x9_._48-k"));
                 foreach (var buttonLike in buttonLikeList)

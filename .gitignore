@@ -154,3 +154,7 @@ $RECYCLE.BIN/
 
 # Mac desktop service store files
 .DS_Store
+/.vs/HackLikeFacebook/v15/Server/sqlite3/storage.ide-wal
+/.vs/HackLikeFacebook/v15/Server/sqlite3/storage.ide-shm
+/.vs/HackLikeFacebook/v15/Server/sqlite3/storage.ide
+/.vs/HackLikeFacebook/v15/Server/sqlite3/db.lock

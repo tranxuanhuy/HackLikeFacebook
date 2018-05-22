@@ -19,27 +19,32 @@ namespace HackLikeFacebook
     {
         public Form1()
         {
-            //InitializeComponent();
+            InitializeComponent();
+            
+        }
+
+        private static void CreateThread()
+        {
             MyThread[] thr = new MyThread[100];
             Thread[] tid = new Thread[100];
 
-            for (int i = 0; i <3; i++)
+            for (int i = 0; i < 3; i++)
             {
 
 
-         
 
-              
-   
-                    thr[i] = new MyThread();
-                    tid[i] = new Thread(new ThreadStart(thr[i].Thread1));
 
-                    tid[i].Start();
-   
-                    
-                
 
-                 }
+                string proxy = ReadProxyAtLine(i + 1, "proxy.txt");
+                thr[i] = new MyThread();
+                tid[i] = new Thread(new ThreadStart(thr[i].Thread1));
+                tid[i].Name = proxy;
+                tid[i].Start();
+
+
+
+
+            }
 
             //for (int i = 0; i < 2; i++)
             //{
@@ -47,12 +52,17 @@ namespace HackLikeFacebook
             //}
         }
 
-        
-
+        public static string ReadProxyAtLine(int p, string file)
+        {
+            string proxy = File.ReadLines(file).Skip(p - 1).First();
+            string[] aproxy = proxy.Split('\t');
+            return aproxy[0] + ':' + aproxy[1];
+        }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            }
+            CreateThread();
+        }
 
       
     }
