@@ -19,10 +19,10 @@ namespace HackLikeFacebook
             Demo w = new Demo();
             for (int i = 0; i < 1; i++)
             {
-
+                string emailCreated = CreateAccountandLike(proxy);
                 try
                 {
-                    string emailCreated = CreateAccountandLike(proxy);
+                    
                     
                     if (emailCreated != null)
                     {
@@ -32,7 +32,7 @@ namespace HackLikeFacebook
                 }
                 catch (Exception e)
                 {
-
+                    w.WriteToFileThreadSafe(emailCreated + "\t\t" + "country error", "adsLog1.txt");
                     Console.WriteLine("{0} Second exception caught.", e);
                 }  
             }
@@ -44,7 +44,7 @@ namespace HackLikeFacebook
         {
             // Create a request for the URL. 
             WebRequest request = WebRequest.Create("http://ip-score.com");
-            request.Proxy = new WebProxy(proxy.Split(':')[0], int.Parse(proxy.Split(':')[1]));
+            //request.Proxy = new WebProxy(proxy.Split(':')[0], int.Parse(proxy.Split(':')[1]));
             // If required by the server, set the credentials.
             request.Credentials = CredentialCache.DefaultCredentials;
             // Get the response.
@@ -59,7 +59,7 @@ namespace HackLikeFacebook
             string responseFromServer = reader.ReadToEnd();
             // Display the content.
             //Console.WriteLine(responseFromServer);
-            string filename = proxy.Replace(":", " ");
+            string filename = proxy.Replace("\t", " ");
             filename = filename + ".txt";
             File.WriteAllText(filename, responseFromServer);
             string info = File.ReadLines(filename).Skip(145).First() + File.ReadLines(filename).Skip(146).First() + File.ReadLines(filename).Skip(147).First();
@@ -78,8 +78,9 @@ namespace HackLikeFacebook
                 ChromeOptions options = new ChromeOptions();
                 options.AddArgument("--disable-popup-blocking");
                 options.AddArguments("--disable-notifications");
+                //options.AddUserProfilePreference("profile.managed_default_content_settings.images", 2);
                 //options.AddArguments("--proxy-server="+proxy);
-                options.AddArguments("--proxy-server=socks5://" + proxy);
+                //options.AddArguments("--proxy-server=socks5://" + proxy);
                 string proxyFromFile = ReadFileAtLine(1, "proxy.txt").Replace("\t", ":");
                 
                 var userAgent = ReadRandomLineOfFile("useragentswitcher.txt");
@@ -103,6 +104,9 @@ namespace HackLikeFacebook
                 Random rd = new Random();
                 Numrd = rd.Next(1, 3);
                 var firstname = ReadRandomLineOfFile("vnname.txt").Split(' ')[Numrd];
+                System.Threading.Thread.Sleep(1000);
+                Numrd = rd.Next(1, 3);
+                firstname += " " + ReadRandomLineOfFile("vnname.txt").Split(' ')[Numrd];
                 System.Threading.Thread.Sleep(1000);
                 Numrd = rd.Next(1, 3);
                 var lastname = ReadRandomLineOfFile("vnname.txt").Split(' ')[Numrd];
@@ -230,17 +234,11 @@ namespace HackLikeFacebook
                         Console.WriteLine("{0} Second exception caught.", ex);
                     }
                 }
-                
+                //neu ko co ori nghia la bi checkpoint thi ko log email
+                if (!driver.Url.Contains("ori")) email = null;
                 driver.Quit();
-                //neu ko co like button nghia la bi checkpoint thi ko log email
-                if (buttonLikeList.Count!=0)
-                {
-                    return email;
-                }
-                else
-                {
-                    return null;
-                }
+                return email;
+                
             }
         }
 

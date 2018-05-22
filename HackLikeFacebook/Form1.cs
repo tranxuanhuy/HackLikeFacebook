@@ -27,8 +27,8 @@ namespace HackLikeFacebook
         {
             MyThread[] thr = new MyThread[100];
             Thread[] tid = new Thread[100];
-
-            for (int i = 0; i < 3; i++)
+            int numberInstantWeb = 2;
+            for (int i = 0; i < numberInstantWeb; i++)
             {
 
 
@@ -46,22 +46,39 @@ namespace HackLikeFacebook
 
             }
 
-            //for (int i = 0; i < 2; i++)
-            //{
-            //    tid[i].Join(); 
-            //}
+            for (int i = 0; i < numberInstantWeb; i++)
+            {
+                tid[i].Join();
+            }
+
+            IncrementProxyOrderAstrill();
+        }
+
+        private static void IncrementProxyOrderAstrill()
+        {
+            string SttAstrillProxy = ReadProxyAtLine(1, "toAutoitData.txt");
+            using (System.IO.StreamWriter file = new System.IO.StreamWriter("toAutoitData.txt"))
+            {
+                file.Write(int.Parse(SttAstrillProxy) + 1);
+            }
+            System.Diagnostics.Process cmd;
+            cmd = System.Diagnostics.Process.Start("changeSTTAstrillProxy.exe");
+            cmd.WaitForExit();
         }
 
         public static string ReadProxyAtLine(int p, string file)
         {
             string proxy = File.ReadLines(file).Skip(p - 1).First();
-            string[] aproxy = proxy.Split('\t');
-            return aproxy[0] + ':' + aproxy[1];
+            //string[] aproxy = proxy.Split('\t');
+            return proxy;
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            CreateThread();
+            for (int i = 0; i < 12; i++)
+            {
+                CreateThread(); 
+            }
         }
 
       
