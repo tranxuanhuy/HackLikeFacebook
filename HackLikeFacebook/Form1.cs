@@ -27,7 +27,7 @@ namespace HackLikeFacebook
         {
             MyThread[] thr = new MyThread[100];
             Thread[] tid = new Thread[100];
-            int numberInstantWeb = 2;
+            int numberInstantWeb = 3;
             for (int i = 0; i < numberInstantWeb; i++)
             {
 
@@ -75,7 +75,7 @@ namespace HackLikeFacebook
 
         private void button1_Click(object sender, EventArgs e)
         {
-            for (int i = 0; i < 12; i++)
+            for (int i = 0; i < 1; i++)
             {
                 CreateThread(); 
             }

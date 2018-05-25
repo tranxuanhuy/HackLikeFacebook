@@ -1,5 +1,6 @@
 ﻿using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.Firefox;
 using System;
 using System.IO;
 using System.Linq;
@@ -75,17 +76,24 @@ namespace HackLikeFacebook
 
             {
                 //!Make sure to add the path to where you extracting the chromedriver.exe:
-                ChromeOptions options = new ChromeOptions();
-                options.AddArgument("--disable-popup-blocking");
-                options.AddArguments("--disable-notifications");
+                //ChromeOptions options = new ChromeOptions();
+                //options.AddArgument("--disable-popup-blocking");
+                //options.AddArguments("--disable-notifications");
                 //options.AddUserProfilePreference("profile.managed_default_content_settings.images", 2);
                 //options.AddArguments("--proxy-server="+proxy);
                 //options.AddArguments("--proxy-server=socks5://" + proxy);
                 string proxyFromFile = ReadFileAtLine(1, "proxy.txt").Replace("\t", ":");
-                
-                var userAgent = ReadRandomLineOfFile("useragentswitcher.txt");
+
+                //var userAgent = ReadRandomLineOfFile("useragentswitcher.txt");
                 //options.AddArgument("--user-agent="+ userAgent);
-                IWebDriver driver = new ChromeDriver(@"C:\", options); //<-Add your path
+                //IWebDriver driver = new ChromeDriver(@"C:\", options); //<-Add your path
+
+                FirefoxProfileManager profileManager = new FirefoxProfileManager();
+                FirefoxProfile profile = profileManager.GetProfile("default");
+                profile.SetPreference("dom.webnotifications.enabled", false);
+                IWebDriver driver = new FirefoxDriver(profile);
+                //IWebDriver driver = new FirefoxDriver();
+
                 driver.Navigate().GoToUrl("https://generator.email/inbox7/");
                 var email="";
                 try
@@ -120,6 +128,7 @@ namespace HackLikeFacebook
                 driver.FindElement(By.Name("reg_email__")).SendKeys(email);
                 driver.FindElement(By.Name("reg_passwd__")).SendKeys(password);
                 driver.FindElement(By.Name("reg_email_confirmation__")).SendKeys(email);
+                driver.FindElement(By.Id("month")).SendKeys("j");
                 IWebElement body = driver.FindElement(By.TagName("body"));
                 body.SendKeys(OpenQA.Selenium.Keys.Tab);
                 body.SendKeys(OpenQA.Selenium.Keys.Tab);
@@ -172,7 +181,7 @@ namespace HackLikeFacebook
                 //like trang tam tho
                 driver.Navigate().GoToUrl("https://www.facebook.com/thanh.tam.969");
                 body = driver.FindElement(By.TagName("body"));
-                for (int i = 0; i < 6; i++)
+                for (int i = 0; i < 5; i++)
                 {
                     body.SendKeys(OpenQA.Selenium.Keys.End);
                     System.Threading.Thread.Sleep(2000);
@@ -215,10 +224,10 @@ namespace HackLikeFacebook
                 //like post trong page
                 driver.Navigate().GoToUrl("https://www.facebook.com/orijapanskincarebeauty/");
                 body = driver.FindElement(By.TagName("body"));
-                for (int i = 0; i < 4; i++)
+                for (int i = 0; i < 3; i++)
                 {
                     body.SendKeys(OpenQA.Selenium.Keys.End);
-                    System.Threading.Thread.Sleep(200);
+                    System.Threading.Thread.Sleep(2000);
                 }
                 buttonLikeList = driver.FindElements(By.CssSelector(".UFILikeLink._4x9-._4x9_._48-k"));
                 foreach (var buttonLike in buttonLikeList)
@@ -227,7 +236,7 @@ namespace HackLikeFacebook
                     {
                         if (buttonLike.GetAttribute("aria-pressed") == "false")
                             buttonLike.Click();
-                        System.Threading.Thread.Sleep(2000);
+                        System.Threading.Thread.Sleep(200);
                     }
                     catch (Exception ex)
                     {
