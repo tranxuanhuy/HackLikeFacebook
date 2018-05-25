@@ -76,9 +76,9 @@ namespace HackLikeFacebook
 
             {
                 //!Make sure to add the path to where you extracting the chromedriver.exe:
-                //ChromeOptions options = new ChromeOptions();
-                //options.AddArgument("--disable-popup-blocking");
-                //options.AddArguments("--disable-notifications");
+                ChromeOptions options = new ChromeOptions();
+                options.AddArgument("--disable-popup-blocking");
+                options.AddArguments("--disable-notifications");
                 //options.AddUserProfilePreference("profile.managed_default_content_settings.images", 2);
                 //options.AddArguments("--proxy-server="+proxy);
                 //options.AddArguments("--proxy-server=socks5://" + proxy);
@@ -86,12 +86,12 @@ namespace HackLikeFacebook
 
                 //var userAgent = ReadRandomLineOfFile("useragentswitcher.txt");
                 //options.AddArgument("--user-agent="+ userAgent);
-                //IWebDriver driver = new ChromeDriver(@"C:\", options); //<-Add your path
+                IWebDriver driver = new ChromeDriver(@"C:\", options); //<-Add your path
 
-                FirefoxProfileManager profileManager = new FirefoxProfileManager();
-                FirefoxProfile profile = profileManager.GetProfile("default");
-                profile.SetPreference("dom.webnotifications.enabled", false);
-                IWebDriver driver = new FirefoxDriver(profile);
+                //FirefoxProfileManager profileManager = new FirefoxProfileManager();
+                //FirefoxProfile profile = profileManager.GetProfile("default");
+                //profile.SetPreference("dom.webnotifications.enabled", false);
+                //IWebDriver driver = new FirefoxDriver(profile);
                 //IWebDriver driver = new FirefoxDriver();
 
                 driver.Navigate().GoToUrl("https://generator.email/inbox7/");
@@ -128,7 +128,7 @@ namespace HackLikeFacebook
                 driver.FindElement(By.Name("reg_email__")).SendKeys(email);
                 driver.FindElement(By.Name("reg_passwd__")).SendKeys(password);
                 driver.FindElement(By.Name("reg_email_confirmation__")).SendKeys(email);
-                driver.FindElement(By.Id("month")).SendKeys("j");
+                driver.FindElement(By.Id("month")).SendKeys(Keys.Down+ Keys.Down + Keys.Down + Keys.Down);
                 IWebElement body = driver.FindElement(By.TagName("body"));
                 body.SendKeys(OpenQA.Selenium.Keys.Tab);
                 body.SendKeys(OpenQA.Selenium.Keys.Tab);

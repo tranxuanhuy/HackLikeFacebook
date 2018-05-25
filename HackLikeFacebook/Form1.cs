@@ -57,6 +57,10 @@ namespace HackLikeFacebook
         private static void IncrementProxyOrderAstrill()
         {
             string SttAstrillProxy = ReadProxyAtLine(1, "toAutoitData.txt");
+            if (int.Parse(SttAstrillProxy )== 128)
+            {
+                SttAstrillProxy = "1"; 
+            }
             using (System.IO.StreamWriter file = new System.IO.StreamWriter("toAutoitData.txt"))
             {
                 file.Write(int.Parse(SttAstrillProxy) + 1);
@@ -75,7 +79,7 @@ namespace HackLikeFacebook
 
         private void button1_Click(object sender, EventArgs e)
         {
-            for (int i = 0; i < 1; i++)
+            for (int i = 0; i < 100; i++)
             {
                 CreateThread(); 
             }
