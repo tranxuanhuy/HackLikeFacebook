@@ -27,7 +27,7 @@ namespace HackLikeFacebook
         {
             MyThread[] thr = new MyThread[100];
             Thread[] tid = new Thread[100];
-            int numberInstantWeb = 3;
+            int numberInstantWeb = int.Parse(ReadFileAtLine(1, "config").Split(':')[1]);
             for (int i = 0; i < numberInstantWeb; i++)
             {
 
@@ -52,6 +52,12 @@ namespace HackLikeFacebook
             }
 
             IncrementProxyOrderAstrill();
+        }
+
+        private static string ReadFileAtLine(int p, string file)
+        {
+            return File.ReadLines(file).Skip(p - 1).First();
+
         }
 
         private static void IncrementProxyOrderAstrill()
