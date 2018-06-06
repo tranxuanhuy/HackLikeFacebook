@@ -20,20 +20,20 @@ namespace HackLikeFacebook
             Demo w = new Demo();
             for (int i = 0; i < 1; i++)
             {
-                string emailCreated = CreateAccountandLike(proxy);
+                string emailPassIdFB = CreateAccountandLike(proxy);
                 try
                 {
                     
                     
-                    if (emailCreated != null)
+                    if (emailPassIdFB != null)
                     {
                         string country = getCountryofProxy(proxy);
-                        w.WriteToFileThreadSafe(emailCreated+"\t\t"+ country, "adsLog1.txt");
+                        w.WriteToFileThreadSafe(emailPassIdFB+"\t\t"+ country, "adsLog1.txt");
                     }
                 }
                 catch (Exception e)
                 {
-                    w.WriteToFileThreadSafe(emailCreated + "\t\t" + "country error", "adsLog1.txt");
+                    w.WriteToFileThreadSafe(emailPassIdFB + "\t\t" + "country error", "adsLog1.txt");
                     Console.WriteLine("{0} Second exception caught.", e);
                 }  
             }
@@ -86,7 +86,7 @@ namespace HackLikeFacebook
 
                 //var userAgent = ReadRandomLineOfFile("useragentswitcher.txt");
                 //options.AddArgument("--user-agent="+ userAgent);
-                IWebDriver driver = new ChromeDriver(@"C:\", options); //<-Add your path
+                IWebDriver driver = new ChromeDriver(options); //<-Add your path
 
                 //FirefoxProfileManager profileManager = new FirefoxProfileManager();
                 //FirefoxProfile profile = profileManager.GetProfile("default");
@@ -121,13 +121,19 @@ namespace HackLikeFacebook
                 System.Threading.Thread.Sleep(1000);
                 Numrd = rd.Next(1, 3);
                 lastname += " "+ReadRandomLineOfFile("vnname.txt").Split(' ')[Numrd];
-                var password = "950460";
+                var password = GeneratePassword(10, 3);
 
                 driver.FindElement(By.Name("lastname")).SendKeys(lastname);
                 driver.FindElement(By.Name("firstname")).SendKeys(firstname);
                 driver.FindElement(By.Name("reg_email__")).SendKeys(email);
                 driver.FindElement(By.Name("reg_passwd__")).SendKeys(password);
                 driver.FindElement(By.Name("reg_email_confirmation__")).SendKeys(email);
+                
+                
+                Numrd = rd.Next(1, 28);
+                driver.FindElement(By.Id("day")).SendKeys(Numrd.ToString());
+                Numrd = rd.Next(1962, 2000);
+                driver.FindElement(By.Id("year")).SendKeys(Numrd.ToString());
                 driver.FindElement(By.Id("month")).SendKeys(Keys.Down+ Keys.Down + Keys.Down + Keys.Down);
                 IWebElement body = driver.FindElement(By.TagName("body"));
                 body.SendKeys(OpenQA.Selenium.Keys.Tab);
@@ -159,6 +165,11 @@ namespace HackLikeFacebook
                 //driver.FindElement(By.Name("code")).Submit();
                 System.Threading.Thread.Sleep(5000); body = driver.FindElement(By.TagName("body"));
                 body.SendKeys(OpenQA.Selenium.Keys.Enter);
+                driver.Navigate().Back();
+                driver.FindElement(By.CssSelector("._1vp5")).Click();
+                System.Threading.Thread.Sleep(5000);
+
+                string idFB = driver.Url;
 
                 //follow tam tho
                 driver.Navigate().GoToUrl("https://www.facebook.com/thanh.tam.969");
@@ -246,10 +257,73 @@ namespace HackLikeFacebook
                 //neu ko co ori nghia la bi checkpoint thi ko log email
                 if (!driver.Url.Contains("ori")) email = null;
                 driver.Quit();
-                return email;
+                return email+"\t"+password+"\t" + idFB;
                 
             }
         }
+
+        public static void WriteLineEmptyFile(string content = "", string filewrite = "pvas.txt")
+        {
+            using (System.IO.StreamWriter file = new System.IO.StreamWriter(filewrite, false))
+            {
+
+                file.WriteLine(content.ToLower());
+
+            }
+        }
+
+        public static string GeneratePassword(int Length, int NonAlphaNumericChars)
+        {
+            string allowedChars = "abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ0123456789";
+            string allowedNonAlphaNum = "!@#$%^&*()_-+=[{]};:<>|./?";
+            Random rd = new Random();
+
+            if (NonAlphaNumericChars > Length || Length <= 0 || NonAlphaNumericChars < 0)
+                throw new ArgumentOutOfRangeException();
+
+            char[] pass = new char[Length];
+            int[] pos = new int[Length];
+            int i = 0, j = 0, temp = 0;
+            bool flag = false;
+
+            //Random the position values of the pos array for the string Pass
+            while (i < Length - 1)
+            {
+                j = 0;
+                flag = false;
+                temp = rd.Next(0, Length);
+                for (j = 0; j < Length; j++)
+                    if (temp == pos[j])
+                    {
+                        flag = true;
+                        j = Length;
+                    }
+
+                if (!flag)
+                {
+                    pos[i] = temp;
+                    i++;
+                }
+            }
+
+            //Random the AlphaNumericChars
+            for (i = 0; i < Length - NonAlphaNumericChars; i++)
+                pass[i] = allowedChars[rd.Next(0, allowedChars.Length)];
+
+            //Random the NonAlphaNumericChars
+            for (i = Length - NonAlphaNumericChars; i < Length; i++)
+                pass[i] = allowedNonAlphaNum[rd.Next(0, allowedNonAlphaNum.Length)];
+
+            //Set the sorted array values by the pos array for the rigth posistion
+            char[] sorted = new char[Length];
+            for (i = 0; i < Length; i++)
+                sorted[i] = pass[pos[i]];
+
+            string Pass = new String(sorted);
+
+            return Pass;
+        }
+
 
         public static void WriteLinePostingLog(string content = "", string filewrite = "adsLog.txt")
         {
