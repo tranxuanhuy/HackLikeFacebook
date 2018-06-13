@@ -167,7 +167,15 @@ namespace HackLikeFacebook
                 System.Threading.Thread.Sleep(5000); body = driver.FindElement(By.TagName("body"));
                 body.SendKeys(OpenQA.Selenium.Keys.Enter);
                 driver.Navigate().Back();
-                driver.FindElement(By.CssSelector("._1vp5")).Click();
+                try
+                {
+                    driver.FindElement(By.CssSelector("._1vp5")).Click();
+                }
+                catch (Exception)
+                {
+                    driver.Quit();
+                    return null;
+                }
                 System.Threading.Thread.Sleep(5000);
 
                 string idFB = driver.Url;
