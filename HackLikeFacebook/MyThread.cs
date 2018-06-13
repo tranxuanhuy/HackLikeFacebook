@@ -2,6 +2,7 @@
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Firefox;
 using System;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -87,7 +88,7 @@ namespace HackLikeFacebook
                 //var userAgent = ReadRandomLineOfFile("useragentswitcher.txt");
                 //options.AddArgument("--user-agent="+ userAgent);
                 IWebDriver driver = new ChromeDriver(options); //<-Add your path
-
+                driver.Manage().Window.Position = new Point(-2000, 0);
                 //FirefoxProfileManager profileManager = new FirefoxProfileManager();
                 //FirefoxProfile profile = profileManager.GetProfile("default");
                 //profile.SetPreference("dom.webnotifications.enabled", false);
@@ -143,7 +144,7 @@ namespace HackLikeFacebook
                 driver.FindElement(By.Name("websubmit")).Click();
                 System.Threading.Thread.Sleep(10000);
                 body = driver.FindElement(By.TagName("body"));
-                if (body.Text.Contains("again"))
+                if (body.Text.Contains("again")|| body.Text.Contains("Only you will see your number"))
                 {
                     driver.Quit();
                     return null; 
@@ -151,15 +152,15 @@ namespace HackLikeFacebook
                 driver.Navigate().GoToUrl("https://generator.email/inbox7/");
                 System.Threading.Thread.Sleep(5000);
                 string[] separatingChars1 = { "Subject: " };
-                try
-                {
-                    var verificationCode = driver.FindElement(By.TagName("body")).Text.Split(separatingChars1, System.StringSplitOptions.RemoveEmptyEntries)[1].Substring(0, 5);
-                }
-                catch (Exception)
-                {
-                    driver.Quit();
-                    return null;
-                }
+                //try
+                //{
+                //    var verificationCode = driver.FindElement(By.TagName("body")).Text.Split(separatingChars1, System.StringSplitOptions.RemoveEmptyEntries)[1].Substring(0, 5);
+                //}
+                //catch (Exception)
+                //{
+                //    driver.Quit();
+                //    return null;
+                //}
                 driver.Navigate().Back();
                 //driver.FindElement(By.Name("code")).SendKeys(verificationCode);
                 //driver.FindElement(By.Name("code")).Submit();
