@@ -1,6 +1,7 @@
 ﻿using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Firefox;
+using OpenQA.Selenium.Support.UI;
 using System;
 using System.Drawing;
 using System.IO;
@@ -80,7 +81,7 @@ namespace HackLikeFacebook
                 ChromeOptions options = new ChromeOptions();
                 options.AddArgument("--disable-popup-blocking");
                 options.AddArguments("--disable-notifications");
-                //options.AddUserProfilePreference("profile.managed_default_content_settings.images", 2);
+                options.AddUserProfilePreference("profile.managed_default_content_settings.images", 2);
                 //options.AddArguments("--proxy-server="+proxy);
                 //options.AddArguments("--proxy-server=socks5://" + proxy);
                 string proxyFromFile = ReadFileAtLine(1, "proxy.txt").Replace("\t", ":");
@@ -94,19 +95,39 @@ namespace HackLikeFacebook
                 //profile.SetPreference("dom.webnotifications.enabled", false);
                 //IWebDriver driver = new FirefoxDriver(profile);
                 //IWebDriver driver = new FirefoxDriver();
-
-                driver.Navigate().GoToUrl("https://generator.email/inbox7/");
-                var email="";
+                WebDriverWait wait;
+                wait = new WebDriverWait(driver, TimeSpan.FromSeconds(20));
+                recreateEmail:
+                driver.Navigate().GoToUrl("http://www.20minutemail.com");
                 try
                 {
-                    email = driver.FindElement(By.Id("email_ch_text")).Text;
+                    wait.Until(ExpectedConditions.PresenceOfAllElementsLocatedBy(By.XPath("//*[@id=\"headerwrap\"]/header/div[2]/div/div/input[2]")));
                 }
                 catch (Exception)
                 {
+
                     driver.Quit();
                     return null;
-
                 }
+                driver.FindElement(By.XPath("//*[@id=\"headerwrap\"]/header/div[2]/div/div/input[2]")).Click();
+                
+                try
+                {
+                    wait.Until(ExpectedConditions.PresenceOfAllElementsLocatedBy(By.Id("userTempMail")));
+                }
+                catch (Exception)
+                {
+
+                    driver.Quit();
+                    return null;
+                }
+                var 
+                    email = driver.FindElement(By.Id("userTempMail")).Text;
+                if (!email.Contains("20minutemail"))
+                {
+                    goto recreateEmail; 
+                }
+                var tempURL = driver.Url;
                 driver.Navigate().GoToUrl("https://www.facebook.com/");
 
                 int Numrd;
@@ -143,30 +164,41 @@ namespace HackLikeFacebook
                 driver.FindElement(By.Name("sex")).Click();
                 driver.FindElement(By.Name("websubmit")).Click();
                 System.Threading.Thread.Sleep(10000);
+
+                if (driver.Url.Contains("checkpoint"))
+                {
+                    driver.Quit();
+                    return null;
+                }
+
                 body = driver.FindElement(By.TagName("body"));
                 if (body.Text.Contains("again")|| body.Text.Contains("Only you will see your number"))
                 {
                     driver.Quit();
                     return null; 
                 }
-                driver.Navigate().GoToUrl("https://generator.email/inbox7/");
+                driver.Navigate().GoToUrl(tempURL);
                 System.Threading.Thread.Sleep(5000);
-                string[] separatingChars1 = { "Subject: " };
-                //try
-                //{
-                //    var verificationCode = driver.FindElement(By.TagName("body")).Text.Split(separatingChars1, System.StringSplitOptions.RemoveEmptyEntries)[1].Substring(0, 5);
-                //}
-                //catch (Exception)
-                //{
-                //    driver.Quit();
-                //    return null;
-                //}
+                string[] separatingChars1 = { "registration@facebookmail.com" };
+                var verificationCode="";
+                try
+                {
+                    verificationCode = driver.FindElement(By.TagName("body")).Text;
+                }
+                catch (Exception)
+                {
+                    driver.Quit();
+                    return null;
+                }
+                verificationCode=verificationCode.Split(separatingChars1, System.StringSplitOptions.RemoveEmptyEntries)[1].Substring(2, 5);
                 driver.Navigate().Back();
-                //driver.FindElement(By.Name("code")).SendKeys(verificationCode);
-                //driver.FindElement(By.Name("code")).Submit();
-                System.Threading.Thread.Sleep(5000); body = driver.FindElement(By.TagName("body"));
-                body.SendKeys(OpenQA.Selenium.Keys.Enter);
-                driver.Navigate().Back();
+                driver.FindElement(By.Name("code")).SendKeys(verificationCode);
+                driver.FindElement(By.Name("code")).Submit();
+                System.Threading.Thread.Sleep(10000);
+                body = driver.FindElement(By.TagName("body"));
+                body.SendKeys(Keys.Tab+Keys.Enter);
+                //driver.Navigate().Back();
+                
                 try
                 {
                     driver.FindElement(By.CssSelector("._1vp5")).Click();
