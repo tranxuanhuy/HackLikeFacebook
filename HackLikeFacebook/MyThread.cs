@@ -179,7 +179,7 @@ namespace HackLikeFacebook
                 }
                 driver.Navigate().GoToUrl(tempURL);
                 System.Threading.Thread.Sleep(5000);
-                string[] separatingChars1 = { "registration@facebookmail.com" };
+                
                 var verificationCode="";
                 try
                 {
@@ -190,7 +190,9 @@ namespace HackLikeFacebook
                     driver.Quit();
                     return null;
                 }
-                verificationCode=verificationCode.Split(separatingChars1, System.StringSplitOptions.RemoveEmptyEntries)[1].Substring(2, 5);
+                string[] separatingChars1 = { "Subject" };
+
+                verificationCode =verificationCode.Split(separatingChars1, System.StringSplitOptions.RemoveEmptyEntries)[1].Substring(2, 5);
                 driver.Navigate().Back();
                 driver.FindElement(By.Name("code")).SendKeys(verificationCode);
                 driver.FindElement(By.Name("code")).Submit();
