@@ -51,7 +51,7 @@ namespace HackLikeFacebook
                 tid[i].Join();
             }
 
-            IncrementProxyOrderAstrill();
+            //IncrementProxyOrderAstrill();
         }
 
         private static string ReadFileAtLine(int p, string file)
@@ -85,7 +85,7 @@ namespace HackLikeFacebook
 
         private void button1_Click(object sender, EventArgs e)
         {
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < 1; i++)
             {
                 CreateThread(); 
             }

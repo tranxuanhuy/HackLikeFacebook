@@ -99,10 +99,12 @@
   <ItemGroup>
     <Content Include="bin\Debug\adsLog1.txt" />
     <Content Include="bin\Debug\changeSTTAstrillProxy.exe" />
+    <Content Include="bin\Debug\chromedriver.exe" />
     <Content Include="bin\Debug\geckodriver.exe" />
     <Content Include="bin\Debug\gmailTaobangtay.txt" />
     <Content Include="bin\Debug\proxy.txt" />
     <Content Include="bin\Debug\toAutoitData.txt" />
+    <Content Include="bin\Debug\useragentswitcher.txt" />
     <Content Include="bin\Debug\vnname.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

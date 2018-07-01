@@ -86,14 +86,14 @@ namespace HackLikeFacebook
                 //options.AddArguments("--proxy-server=socks5://" + proxy);
                 string proxyFromFile = ReadFileAtLine(1, "proxy.txt").Replace("\t", ":");
 
-                //var userAgent = ReadRandomLineOfFile("useragentswitcher.txt");
-                //options.AddArgument("--user-agent="+ userAgent);
-                IWebDriver driver = new ChromeDriver(options); //<-Add your path
-                driver.Manage().Window.Position = new Point(-2000, 0);
-                //FirefoxProfileManager profileManager = new FirefoxProfileManager();
-                //FirefoxProfile profile = profileManager.GetProfile("default");
-                //profile.SetPreference("dom.webnotifications.enabled", false);
-                //IWebDriver driver = new FirefoxDriver(profile);
+                var userAgent = ReadRandomLineOfFile("useragentswitcher.txt");
+                options.AddArgument("--user-agent=" + userAgent);
+                //IWebDriver driver = new ChromeDriver(options); //<-Add your path
+                //driver.Manage().Window.Position = new Point(-2000, 0);
+                FirefoxProfileManager profileManager = new FirefoxProfileManager();
+                FirefoxProfile profile = profileManager.GetProfile("Default User");
+                profile.SetPreference("dom.webnotifications.enabled", false);
+                IWebDriver driver = new FirefoxDriver(profile);
                 //IWebDriver driver = new FirefoxDriver();
                 WebDriverWait wait;
                 wait = new WebDriverWait(driver, TimeSpan.FromSeconds(20));
@@ -190,9 +190,9 @@ namespace HackLikeFacebook
                     driver.Quit();
                     return null;
                 }
-                string[] separatingChars1 = { "Subject" };
+                string[] separatingChars1 = { " là" };
 
-                verificationCode =verificationCode.Split(separatingChars1, System.StringSplitOptions.RemoveEmptyEntries)[1].Substring(2, 5);
+                verificationCode = verificationCode.Split(separatingChars1, System.StringSplitOptions.RemoveEmptyEntries)[0].Substring(verificationCode.Split(separatingChars1, System.StringSplitOptions.RemoveEmptyEntries)[0].Length - 5);
                 driver.Navigate().Back();
                 driver.FindElement(By.Name("code")).SendKeys(verificationCode);
                 driver.FindElement(By.Name("code")).Submit();
