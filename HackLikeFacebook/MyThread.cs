@@ -22,22 +22,8 @@ namespace HackLikeFacebook
             Demo w = new Demo();
             for (int i = 0; i < 1; i++)
             {
-                string emailPassIdFB = CreateAccountandLike(proxy);
-                try
-                {
-                    
-                    
-                    if (emailPassIdFB != null)
-                    {
-                        string country = getCountryofProxy(proxy);
-                        w.WriteToFileThreadSafe(emailPassIdFB+"\t\t"+ country, "adsLog1.txt");
-                    }
-                }
-                catch (Exception e)
-                {
-                    w.WriteToFileThreadSafe(emailPassIdFB + "\t\t" + "country error", "adsLog1.txt");
-                    Console.WriteLine("{0} Second exception caught.", e);
-                }  
+                CreateAccountandLike(proxy);
+                
             }
             
 
@@ -73,7 +59,7 @@ namespace HackLikeFacebook
             return info;
         }
 
-        private string CreateAccountandLike(string proxy)
+        private void CreateAccountandLike(string proxy)
         {
 
             {
@@ -81,226 +67,61 @@ namespace HackLikeFacebook
                 ChromeOptions options = new ChromeOptions();
                 options.AddArgument("--disable-popup-blocking");
                 options.AddArguments("--disable-notifications");
-                options.AddUserProfilePreference("profile.managed_default_content_settings.images", 2);
+                //options.AddUserProfilePreference("profile.managed_default_content_settings.images", 2);
                 //options.AddArguments("--proxy-server="+proxy);
                 //options.AddArguments("--proxy-server=socks5://" + proxy);
-                string proxyFromFile = ReadFileAtLine(1, "proxy.txt").Replace("\t", ":");
+                //string proxyFromFile = ReadFileAtLine(1, "proxy.txt").Replace("\t", ":");
 
-                var userAgent = ReadRandomLineOfFile("useragentswitcher.txt");
-                options.AddArgument("--user-agent=" + userAgent);
-                //IWebDriver driver = new ChromeDriver(options); //<-Add your path
-                //driver.Manage().Window.Position = new Point(-2000, 0);
-                FirefoxProfileManager profileManager = new FirefoxProfileManager();
-                FirefoxProfile profile = profileManager.GetProfile("Default User");
-                profile.SetPreference("dom.webnotifications.enabled", false);
-                IWebDriver driver = new FirefoxDriver(profile);
-                //IWebDriver driver = new FirefoxDriver();
-                WebDriverWait wait;
-                wait = new WebDriverWait(driver, TimeSpan.FromSeconds(20));
-                recreateEmail:
-                driver.Navigate().GoToUrl("http://www.20minutemail.com");
+                //var userAgent = ReadRandomLineOfFile("useragentswitcher.txt");
+                //options.AddArgument("--user-agent=" + userAgent);
+                IWebDriver driver = new ChromeDriver(options); //<-Add your path
+                                                               //driver.Manage().Window.Position = new Point(-2000, 0);
+                                                               //FirefoxProfileManager profileManager = new FirefoxProfileManager();
+                                                               //FirefoxProfile profile = profileManager.GetProfile("Default User");
+                                                               //profile.SetPreference("dom.webnotifications.enabled", false);
+                                                               //IWebDriver driver = new FirefoxDriver(profile);
+
+
+
+                //like
                 try
                 {
-                    wait.Until(ExpectedConditions.PresenceOfAllElementsLocatedBy(By.XPath("//*[@id=\"headerwrap\"]/header/div[2]/div/div/input[2]")));
+                    driver.Navigate().GoToUrl("https://www.facebook.com/");
+                    driver.FindElement(By.Name("email")).SendKeys("tranxuanhuy047@gmail.com");
+                    driver.FindElement(By.Name("pass")).SendKeys("34ERdfcv#$");
+                    driver.FindElement(By.Name("pass")).SendKeys(Keys.Enter);
+
+                    System.Threading.Thread.Sleep(5000);
+                    IWebElement body = driver.FindElement(By.TagName("body"));
+                    for (int i = 0; i < 5; i++)
+                    {
+                        body.SendKeys(OpenQA.Selenium.Keys.End);
+                        System.Threading.Thread.Sleep(2000);
+                    }
+                    var buttonLikeList = driver.FindElements(By.CssSelector("._6a-y._3l2t._18vj"));
+                    foreach (var buttonLike in buttonLikeList)
+                    {
+                        try
+                        {
+                            if (buttonLike.GetAttribute("aria-pressed") == "false")
+                                buttonLike.Click();
+                            System.Threading.Thread.Sleep(200);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine("{0} Second exception caught.", ex);
+                        }
+                    }
+                    driver.Quit();
                 }
                 catch (Exception)
                 {
 
-                    driver.Quit();
-                    return null;
-                }
-                driver.FindElement(By.XPath("//*[@id=\"headerwrap\"]/header/div[2]/div/div/input[2]")).Click();
-                
-                try
-                {
-                    wait.Until(ExpectedConditions.PresenceOfAllElementsLocatedBy(By.Id("userTempMail")));
-                }
-                catch (Exception)
-                {
-
-                    driver.Quit();
-                    return null;
-                }
-                var 
-                    email = driver.FindElement(By.Id("userTempMail")).Text;
-                if (!email.Contains("20minutemail"))
-                {
-                    goto recreateEmail; 
-                }
-                var tempURL = driver.Url;
-                driver.Navigate().GoToUrl("https://www.facebook.com/");
-
-                int Numrd;
-                Random rd = new Random();
-                Numrd = rd.Next(1, 3);
-                var firstname = ReadRandomLineOfFile("vnname.txt").Split(' ')[Numrd];
-                System.Threading.Thread.Sleep(1000);
-                Numrd = rd.Next(1, 3);
-                firstname += " " + ReadRandomLineOfFile("vnname.txt").Split(' ')[Numrd];
-                System.Threading.Thread.Sleep(1000);
-                Numrd = rd.Next(1, 3);
-                var lastname = ReadRandomLineOfFile("vnname.txt").Split(' ')[Numrd];
-                System.Threading.Thread.Sleep(1000);
-                Numrd = rd.Next(1, 3);
-                lastname += " "+ReadRandomLineOfFile("vnname.txt").Split(' ')[Numrd];
-                var password = GeneratePassword(10, 3);
-
-                driver.FindElement(By.Name("lastname")).SendKeys(lastname);
-                driver.FindElement(By.Name("firstname")).SendKeys(firstname);
-                driver.FindElement(By.Name("reg_email__")).SendKeys(email);
-                driver.FindElement(By.Name("reg_passwd__")).SendKeys(password);
-                driver.FindElement(By.Name("reg_email_confirmation__")).SendKeys(email);
-                
-                
-                Numrd = rd.Next(1, 28);
-                driver.FindElement(By.Id("day")).SendKeys(Numrd.ToString());
-                Numrd = rd.Next(1962, 2000);
-                driver.FindElement(By.Id("year")).SendKeys(Numrd.ToString());
-                driver.FindElement(By.Id("month")).SendKeys(Keys.Down+ Keys.Down + Keys.Down + Keys.Down);
-                IWebElement body = driver.FindElement(By.TagName("body"));
-                body.SendKeys(OpenQA.Selenium.Keys.Tab);
-                body.SendKeys(OpenQA.Selenium.Keys.Tab);
-                body.SendKeys(OpenQA.Selenium.Keys.Tab);
-                driver.FindElement(By.Name("sex")).Click();
-                driver.FindElement(By.Name("websubmit")).Click();
-                System.Threading.Thread.Sleep(10000);
-
-                if (driver.Url.Contains("checkpoint"))
-                {
-                    driver.Quit();
-                    return null;
+                    throw;
                 }
 
-                body = driver.FindElement(By.TagName("body"));
-                if (body.Text.Contains("again")|| body.Text.Contains("Only you will see your number"))
-                {
-                    driver.Quit();
-                    return null; 
-                }
-                driver.Navigate().GoToUrl(tempURL);
-                System.Threading.Thread.Sleep(5000);
-                
-                var verificationCode="";
-                try
-                {
-                    verificationCode = driver.FindElement(By.TagName("body")).Text;
-                }
-                catch (Exception)
-                {
-                    driver.Quit();
-                    return null;
-                }
-                string[] separatingChars1 = { " là" };
-
-                verificationCode = verificationCode.Split(separatingChars1, System.StringSplitOptions.RemoveEmptyEntries)[0].Substring(verificationCode.Split(separatingChars1, System.StringSplitOptions.RemoveEmptyEntries)[0].Length - 5);
-                driver.Navigate().Back();
-                driver.FindElement(By.Name("code")).SendKeys(verificationCode);
-                driver.FindElement(By.Name("code")).Submit();
-                System.Threading.Thread.Sleep(10000);
-                body = driver.FindElement(By.TagName("body"));
-                body.SendKeys(Keys.Tab+Keys.Enter);
-                //driver.Navigate().Back();
-                
-                try
-                {
-                    driver.FindElement(By.CssSelector("._1vp5")).Click();
-                }
-                catch (Exception)
-                {
-                    driver.Quit();
-                    return null;
-                }
-                System.Threading.Thread.Sleep(5000);
-
-                string idFB = driver.Url;
-
-                //follow tam tho
-                driver.Navigate().GoToUrl("https://www.facebook.com/thanh.tam.969");
-                var buttonLikeList = driver.FindElements(By.CssSelector("._42ft._4jy0._63_s._4jy4._517h._51sy"));
-                foreach (var buttonLike in buttonLikeList)
-                {
-                    try
-                    {
-                        System.Threading.Thread.Sleep(2000);
-                        //if (buttonLike.GetAttribute("aria-pressed") == "false")
-                        buttonLike.Click();
-                        System.Threading.Thread.Sleep(2000);
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine("{0} Second exception caught.", ex);
-                    }
-                }
-
-                //like trang tam tho
-                driver.Navigate().GoToUrl("https://www.facebook.com/thanh.tam.969");
-                body = driver.FindElement(By.TagName("body"));
-                for (int i = 0; i < 5; i++)
-                {
-                    body.SendKeys(OpenQA.Selenium.Keys.End);
-                    System.Threading.Thread.Sleep(2000);
-                }
-                buttonLikeList = driver.FindElements(By.CssSelector(".UFILikeLink._4x9-._4x9_._48-k"));
-                foreach (var buttonLike in buttonLikeList)
-                {
-                    try
-                    {
-                        if (buttonLike.GetAttribute("aria-pressed") == "false")
-                            buttonLike.Click();
-                        System.Threading.Thread.Sleep(200);
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine("{0} Second exception caught.", ex);
-                    }
-                }
-
-                //like fanpage ori japan
-
-                //like page
-                driver.Navigate().GoToUrl("https://www.facebook.com/orijapanskincarebeauty/");
-                buttonLikeList = driver.FindElements(By.CssSelector(".likeButton._4jy0._4jy4._517h._51sy._42ft"));
-                foreach (var buttonLike in buttonLikeList)
-                {
-                    try
-                    {
-                        System.Threading.Thread.Sleep(2000);
-                        //if (buttonLike.GetAttribute("aria-pressed") == "false")
-                        buttonLike.Click();
-                        System.Threading.Thread.Sleep(2000);
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine("{0} Second exception caught.", ex);
-                    }
-                }
-
-                //like post trong page
-                driver.Navigate().GoToUrl("https://www.facebook.com/orijapanskincarebeauty/");
-                body = driver.FindElement(By.TagName("body"));
-                for (int i = 0; i < 3; i++)
-                {
-                    body.SendKeys(OpenQA.Selenium.Keys.End);
-                    System.Threading.Thread.Sleep(2000);
-                }
-                buttonLikeList = driver.FindElements(By.CssSelector(".UFILikeLink._4x9-._4x9_._48-k"));
-                foreach (var buttonLike in buttonLikeList)
-                {
-                    try
-                    {
-                        if (buttonLike.GetAttribute("aria-pressed") == "false")
-                            buttonLike.Click();
-                        System.Threading.Thread.Sleep(200);
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine("{0} Second exception caught.", ex);
-                    }
-                }
-                //neu ko co ori nghia la bi checkpoint thi ko log email
-                if (!driver.Url.Contains("ori")) email = null;
-                driver.Quit();
-                return email+"\t"+password+"\t" + idFB;
+               
+              
                 
             }
         }
