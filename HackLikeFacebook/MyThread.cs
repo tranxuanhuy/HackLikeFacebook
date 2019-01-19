@@ -72,8 +72,8 @@ namespace HackLikeFacebook
                 //options.AddArguments("--proxy-server=socks5://" + proxy);
                 //string proxyFromFile = ReadFileAtLine(1, "proxy.txt").Replace("\t", ":");
 
-                //var userAgent = ReadRandomLineOfFile("useragentswitcher.txt");
-                //options.AddArgument("--user-agent=" + userAgent);
+                var userAgent = ReadRandomLineOfFile("useragentswitcher.txt");
+                options.AddArgument("--user-agent=" + userAgent);
                 IWebDriver driver = new ChromeDriver(options); //<-Add your path
                                                                //driver.Manage().Window.Position = new Point(-2000, 0);
                                                                //FirefoxProfileManager profileManager = new FirefoxProfileManager();
@@ -83,17 +83,17 @@ namespace HackLikeFacebook
 
 
 
-                //like
+                
                 try
                 {
                     driver.Navigate().GoToUrl("https://www.facebook.com/");
-                    driver.FindElement(By.Name("email")).SendKeys("tranxuanhuy047@gmail.com");
+                    driver.FindElement(By.Name("email")).SendKeys("0932415093");
                     driver.FindElement(By.Name("pass")).SendKeys("34ERdfcv#$");
                     driver.FindElement(By.Name("pass")).SendKeys(Keys.Enter);
 
-                    System.Threading.Thread.Sleep(5000);
+                    //like
                     IWebElement body = driver.FindElement(By.TagName("body"));
-                    for (int i = 0; i < 5; i++)
+                    for (int i = 0; i < 4; i++)
                     {
                         body.SendKeys(OpenQA.Selenium.Keys.End);
                         System.Threading.Thread.Sleep(2000);
@@ -105,7 +105,46 @@ namespace HackLikeFacebook
                         {
                             if (buttonLike.GetAttribute("aria-pressed") == "false")
                                 buttonLike.Click();
-                            System.Threading.Thread.Sleep(200);
+                            System.Threading.Thread.Sleep(500);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine("{0} Second exception caught.", ex);
+                        }
+                    }
+
+                    //accept fr
+                    driver.Navigate().GoToUrl("https://www.facebook.com/find-friends/browser/");
+                    body = driver.FindElement(By.TagName("body"));
+                    for (int i = 0; i < 1; i++)
+                    {
+                        body.SendKeys(OpenQA.Selenium.Keys.End);
+                        System.Threading.Thread.Sleep(2000);
+                    }
+                    buttonLikeList = driver.FindElements(By.CssSelector("._42ft._4jy0._4jy3._4jy1.selected._51sy"));
+                    foreach (var buttonLike in buttonLikeList)
+                    {
+                        try
+                        {
+                            
+                                buttonLike.Click();
+                            System.Threading.Thread.Sleep(2000);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine("{0} Second exception caught.", ex);
+                        }
+                    }
+
+                    //add fr
+                         buttonLikeList = driver.FindElements(By.CssSelector("._42ft._4jy0.FriendRequestAdd.addButton._4jy3._4jy1.selected._51sy"));
+                    foreach (var buttonLike in buttonLikeList)
+                    {
+                        try
+                        {
+
+                            buttonLike.Click();
+                            System.Threading.Thread.Sleep(2000);
                         }
                         catch (Exception ex)
                         {
